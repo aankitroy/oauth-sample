@@ -3,7 +3,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
@@ -43,31 +42,9 @@ func (s *Server) TokenExchangeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch user details from the user info endpoint
-	req, err := http.NewRequest("GET", s.OIDCConfig.UserInfoURL, nil)
-	if err != nil {
-		http.Error(w, "Failed to create request", http.StatusInternalServerError)
-		return
-	}
-	req.Header.Set("Authorization", "Bearer "+tr.AccessToken)
-	resp, err := http.DefaultClient.Do(req)
-	fmt.Println("resp: ", resp)
+	userInfo, err := auth.GetUserInfo(s.OIDCConfig, tr.AccessToken)
 	if err != nil {
 		http.Error(w, "Failed to fetch user info", http.StatusInternalServerError)
-		return
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		http.Error(w, "Failed to fetch user info", http.StatusUnauthorized)
-		return
-	}
-
-	var userInfo struct {
-		Email  string `json:"email"`
-		UserID string `json:"sub"` // Assuming 'sub' is the user ID field
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		http.Error(w, "Failed to decode user info", http.StatusInternalServerError)
 		return
 	}
 

@@ -19,6 +19,11 @@ type TokenResponse struct {
 	Scope        string `json:"scope,omitempty"`
 }
 
+type UserInfo struct {
+	Email  string `json:"email"`
+	UserID string `json:"sub"` // Assuming 'sub' is the user ID field
+}
+
 type OIDCConfig struct {
 	TokenURL    string
 	ClientID    string
@@ -47,8 +52,6 @@ func ExchangeCodeForTokens(cfg *OIDCConfig, code, codeVerifier string) (*TokenRe
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	fmt.Println("Response: ", resp)
-	fmt.Println("Error: ", err)
 	if err != nil {
 		return nil, err
 	}
@@ -65,4 +68,29 @@ func ExchangeCodeForTokens(cfg *OIDCConfig, code, codeVerifier string) (*TokenRe
 		return nil, err
 	}
 	return &tr, nil
+}
+
+func GetUserInfo(cfg *OIDCConfig, accessToken string) (*UserInfo, error) {
+	req, err := http.NewRequest("GET", cfg.UserInfoURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+accessToken)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("user info endpoint error [%d]: %s", resp.StatusCode, resp.Status)
+	}
+
+	var userInfo UserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		return nil, err
+	}
+	return &userInfo, nil
 }

@@ -23,9 +23,8 @@ export default function Home() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:8081/logout', {
+      const response = await fetch('http://localhost:8000/api/admin/v1/logout', {
         method: 'POST',
-        credentials: 'include', // Include cookies
       });
 
       if (response.ok) {

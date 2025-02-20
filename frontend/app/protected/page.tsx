@@ -6,7 +6,8 @@ export default function ProtectedPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:8081/protected', {
+    fetch('http://localhost:8000/api/admin/v1/protected', {
+      method: 'POST',
       credentials: 'include',
     })
       .then((res) => {

@@ -15,17 +15,17 @@ export default function CallbackPage() {
     if (!codeVerifier) return;
 
     // Call backend to exchange the code.
-    fetch('http://localhost:8081/token-exchange', {
+    fetch('http://localhost:8000/api/admin/v1/token-exchange', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include', // so we can get HttpOnly cookie
-      body: JSON.stringify({ code, codeVerifier }),
+      credentials: 'include',
+      body: JSON.stringify({ code: code, codeVerifier: codeVerifier }),
     })
       .then((res) => {
         if (!res.ok) throw new Error('Token exchange failed');
         return res.json();
       })
-      .then(() => {
+      .then((res) => {
         // Once exchange is successful, go to protected page
         router.push('/protected');
       })
