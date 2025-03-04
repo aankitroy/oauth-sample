@@ -13,17 +13,19 @@ export default function CallbackPage() {
 
     const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
     if (!codeVerifier) return;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI;
 
     // Call backend to exchange the code.
-    fetch('http://localhost:8000/api/admin/v1/token-exchange', {
+    fetch(`${baseUrl}/api/v1/token-exchange`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify({ code: code, codeVerifier: codeVerifier }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: code, codeVerifier: codeVerifier, redirectUri: redirectUri }),
     })
       .then((res) => {
         if (!res.ok) throw new Error('Token exchange failed');
-        return res.json();
+        return;
       })
       .then((res) => {
         // Once exchange is successful, go to protected page

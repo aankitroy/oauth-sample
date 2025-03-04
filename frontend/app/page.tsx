@@ -16,15 +16,18 @@ export default function Home() {
     const ssoUrl = process.env.NEXT_PUBLIC_SSO_AUTHORIZE_URL;
     const clientId = process.env.NEXT_PUBLIC_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_REDIRECT_URI;
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     const authUrl = `${ssoUrl}?response_type=code&client_id=${encodeURIComponent(clientId!)}&redirect_uri=${encodeURIComponent(redirectUri!)}&scope=openid%20email%20profile&code_challenge_method=S256&code_challenge=${codeChallenge}`;
     console.log(authUrl);
     window.location.href = authUrl;
   };
 
   const handleLogout = async () => {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
     try {
-      const response = await fetch('http://localhost:8000/api/admin/v1/logout', {
+      const response = await fetch(`${baseUrl}/api/v1/logout`, {
         method: 'POST',
+        credentials: 'include',
       });
 
       if (response.ok) {

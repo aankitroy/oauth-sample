@@ -6,7 +6,8 @@ export default function ProtectedPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/admin/v1/protected', {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+    fetch(`${baseUrl}/api/v1/protected`, {
       method: 'POST',
       credentials: 'include',
     })
